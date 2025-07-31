@@ -3,9 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Course Management</title>
+    <title>Course Feedback</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    
+    <div class="container">
+        <header>
+            <div class="language-switcher">
+                <button id="en-btn" class="language-btn active">English</button>
+                <button id="fr-btn" class="language-btn">Français</button>
+            </div>
+            <h1 id="title">Course Feedback</h1>
+            <p id="welcome">Please share your thoughts about the course</p>
+        </header>
+
+        <main>
+            <form id="feedback-form">
+                <div class="form-group">
+                    <label id="q1-label" for="q1">What did you enjoy most about the course?</label>
+                    <textarea id="q1" rows="3"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label id="q2-label" for="q2">What was the most challenging part?</label>
+                    <textarea id="q2" rows="3"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label id="q3-label" for="q3">What could be improved?</label>
+                    <textarea id="q3" rows="3"></textarea>
+                </div>
+                
+                <button id="submit-btn" type="submit">Submit Feedback</button>
+            </form>
+        </main>
+    </div>
+
+    <script src="translations.js"></script>
+    <script src="index.js"></script>
 </body>
 </html>
