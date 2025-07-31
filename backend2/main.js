@@ -12,6 +12,14 @@ import swaggerTags from './documentation/swagger.tags.js';
 import courseOfferingRoutes from './routes/courseOffering.routes.js';
 import activityLogRoutes from './routes/activityLog.routes.js';
 import gradeRoutes from './routes/grade.routes.js';
+import DeadlineChecker from './services/deadlineChecker.js';
+import notificationWorker from './workers/notificationWorker.js';
+
+// Start the deadline checker cron jobs
+DeadlineChecker.startCronJobs();
+
+// Start the notification worker
+notificationWorker;
 const app = express();
 // Middleware
 setupMiddleware(app);
