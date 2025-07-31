@@ -10,6 +10,8 @@ import classRoutes from './routes/class.routes.js';
 import moduleRoutes from './routes/module.routes.js';
 import swaggerTags from './documentation/swagger.tags.js';
 import courseOfferingRoutes from './routes/courseOffering.routes.js';
+import activityLogRoutes from './routes/activityLog.routes.js';
+import gradeRoutes from './routes/grade.routes.js';
 const app = express();
 // Middleware
 setupMiddleware(app);
@@ -242,9 +244,10 @@ app.use('/cohorts', cohortRoutes);
 app.use('/classes', classRoutes);
 app.use('/modules', moduleRoutes);
 app.use('/course-offerings', courseOfferingRoutes);
+app.use('/activity-logs', activityLogRoutes);
 // Swagger UI route
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-
+app.use('/grades', gradeRoutes);
 // Start server
 app.listen(5000, () => {
   console.log("Listening on port 5000");
