@@ -1,5 +1,6 @@
 import { Sequelize } from 'sequelize';
-
+import dotenv from 'dotenv';
+dotenv.config();
 // Create a new Sequelize instance
 const sequelize = new Sequelize(
   process.env.DB_NAME,
@@ -7,8 +8,8 @@ const sequelize = new Sequelize(
   process.env.DB_PASS,
   {
     host: process.env.DB_HOST,
-    dialect: process.env.DB_DIALECT,
-    port: parseInt(process.env.DB_PORT, 10),
+    dialect: process.env.DB_DIALECT,  // Must be non-empty string like 'mysql'
+    port: Number(process.env.DB_PORT),
     logging: false,
     pool: {
       max: 5,
@@ -18,7 +19,6 @@ const sequelize = new Sequelize(
     }
   }
 );
-
 
 // Test the connection
 sequelize.authenticate()
