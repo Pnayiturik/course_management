@@ -1,10 +1,11 @@
 import { Sequelize } from 'sequelize';
 
 // Create a new Sequelize instance
-const sequelize = new Sequelize('course_management', 'root', '', {
-  host: '127.0.0.1',
+const sequelize = new Sequelize('course_management', 'avnadmin', 'AVNS_z08HIUUXTn1SYWkvQDW', {
+  host: 'mysql-357c632d-alustudent-ed6a.b.aivencloud.com',
   dialect: 'mysql',
   logging: false, 
+  port: 16575,
   pool: {
     max: 5,
     min: 0,
@@ -12,6 +13,7 @@ const sequelize = new Sequelize('course_management', 'root', '', {
     idle: 10000
   }
 });
+
 
 // Test the connection
 sequelize.authenticate()

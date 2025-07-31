@@ -42,6 +42,19 @@ const router = express.Router();
  *         updated_at:
  *           type: string
  *           format: date-time
+ *         creator:
+ *           $ref: '#/components/schemas/Creator'
+ *     Creator:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: integer
+ *         first_name:
+ *           type: string
+ *         last_name:
+ *           type: string
+ *         email:
+ *           type: string
  *     ModuleInput:
  *       type: object
  *       required:
@@ -57,15 +70,55 @@ const router = express.Router();
  *           type: string
  *         credits:
  *           type: integer
+ *           minimum: 1
  *         is_active:
  *           type: boolean
+ *     PaginatedModules:
+ *       type: object
+ *       properties:
+ *         total:
+ *           type: integer
+ *         page:
+ *           type: integer
+ *         limit:
+ *           type: integer
+ *         data:
+ *           type: array
+ *           items:
+ *             $ref: '#/components/schemas/Module'
+ *   parameters:
+ *     pageParam:
+ *       in: query
+ *       name: page
+ *       schema:
+ *         type: integer
+ *         default: 1
+ *       description: Page number
+ *     limitParam:
+ *       in: query
+ *       name: limit
+ *       schema:
+ *         type: integer
+ *         default: 10
+ *       description: Items per page
+ *     activeFilter:
+ *       in: query
+ *       name: active
+ *       schema:
+ *         type: boolean
+ *       description: Filter by active status
+ *   securitySchemes:
+ *     bearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
  */
 
 /**
  * @swagger
  * /modules:
  *   post:
- *     summary: Create a new module (Admin only)
+ *     summary: Create a new module (Manager only)
  *     tags: [Modules]
  *     security:
  *       - bearerAuth: []
@@ -81,13 +134,40 @@ const router = express.Router();
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Module'
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: integer
+ *                 code:
+ *                   type: string
+ *                 name:
+ *                   type: string
+ *                 description:
+ *                   type: string
+ *                 credits:
+ *                   type: integer
+ *                 is_active:
+ *                   type: boolean
+ *                 created_at:
+ *                   type: string
+ *                   format: date-time
  *       400:
- *         description: Validation error
+ *         description: Validation error or module code exists
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                 details:
+ *                   type: array
+ *                   items:
+ *                     type: string
  *       401:
  *         description: Unauthorized
  *       403:
- *         description: Forbidden (not an admin)
+ *         description: Forbidden (not a manager)
  *       500:
  *         description: Server error
  */
@@ -97,23 +177,19 @@ router.post('/', authenticateToken, authorizeRoles(['manager']), createModule);
  * @swagger
  * /modules:
  *   get:
- *     summary: Get all modules
+ *     summary: Get all modules with pagination
  *     tags: [Modules]
  *     parameters:
- *       - in: query
- *         name: active
- *         schema:
- *           type: boolean
- *         description: Filter by active status
+ *       - $ref: '#/components/parameters/pageParam'
+ *       - $ref: '#/components/parameters/limitParam'
+ *       - $ref: '#/components/parameters/activeFilter'
  *     responses:
  *       200:
- *         description: List of modules
+ *         description: Paginated list of modules
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Module'
+ *               $ref: '#/components/schemas/PaginatedModules'
  *       500:
  *         description: Server error
  */
@@ -123,7 +199,7 @@ router.get('/', getAllModules);
  * @swagger
  * /modules/{id}:
  *   get:
- *     summary: Get a module by ID
+ *     summary: Get a module by ID with creator details
  *     tags: [Modules]
  *     parameters:
  *       - in: path
@@ -134,7 +210,7 @@ router.get('/', getAllModules);
  *         description: Module ID
  *     responses:
  *       200:
- *         description: Module data
+ *         description: Module data with creator information
  *         content:
  *           application/json:
  *             schema:
@@ -150,7 +226,7 @@ router.get('/:id', getModuleById);
  * @swagger
  * /modules/{id}:
  *   put:
- *     summary: Update a module (Admin only)
+ *     summary: Update a module (Manager only)
  *     tags: [Modules]
  *     security:
  *       - bearerAuth: []
@@ -173,13 +249,29 @@ router.get('/:id', getModuleById);
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Module'
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: integer
+ *                 code:
+ *                   type: string
+ *                 name:
+ *                   type: string
+ *                 description:
+ *                   type: string
+ *                 credits:
+ *                   type: integer
+ *                 is_active:
+ *                   type: boolean
+ *                 updated_at:
+ *                   type: string
+ *                   format: date-time
  *       400:
- *         description: Validation error
+ *         description: Validation error or module code exists
  *       401:
  *         description: Unauthorized
  *       403:
- *         description: Forbidden (not an admin)
+ *         description: Forbidden (not a manager)
  *       404:
  *         description: Module not found
  *       500:
@@ -191,7 +283,7 @@ router.put('/:id', authenticateToken, authorizeRoles(['manager']), updateModule)
  * @swagger
  * /modules/{id}:
  *   delete:
- *     summary: Delete a module (Admin only)
+ *     summary: Delete a module (Manager only)
  *     tags: [Modules]
  *     security:
  *       - bearerAuth: []
@@ -205,10 +297,21 @@ router.put('/:id', authenticateToken, authorizeRoles(['manager']), updateModule)
  *     responses:
  *       204:
  *         description: Module deleted successfully
+ *       400:
+ *         description: Cannot delete module with associated classes
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                 solution:
+ *                   type: string
  *       401:
  *         description: Unauthorized
  *       403:
- *         description: Forbidden (not an admin)
+ *         description: Forbidden (not a manager)
  *       404:
  *         description: Module not found
  *       500:
