@@ -6,9 +6,9 @@ const options = {
   definition: {
     openapi: '3.0.0',
     info: {
-      title: 'Online Quiz Platform API',
+      title: 'Online course management Platform API',
       version: '1.0.0',
-      description: 'API documentation for the Online Quiz Platform',
+      description: 'API documentation for the Online course management Platform',
     },
     servers: [
       {
@@ -29,7 +29,7 @@ const options = {
       bearerAuth: [],
     }],
   },
-  apis: ['../endpoints/*.js'], // Path to your route files
+  apis: ['../routes/*.js'], // Path to your route files
 };
 
 const specs = swaggerJsdoc(options);
